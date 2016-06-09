@@ -1,0 +1,32 @@
+web:
+  dockerfile: Dockerfile
+  build: ./docker/nginx
+  container_name: web
+  links:
+    - php
+  ports:
+    - 80:80
+  volumes:
+    - .:/var/www/html
+php:
+  dockerfile: Dockerfile
+  build: ./docker/php
+  container_name: php
+  links:
+    - pg
+    - redis
+  volumes:
+    - .:/var/www/html
+pg:
+  dockerfile: Dockerfile
+  build: ./docker/pg
+  container_name: pg
+  ports:
+    - 5432:5432
+  env_file: .env
+redis:
+  dockerfile: Dockerfile
+  build: ./docker/redis
+  container_name: redis
+  ports:
+    - 6379:6379
