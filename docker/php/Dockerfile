@@ -29,7 +29,7 @@ RUN apt-get install -y git unzip
 
 ADD . /var/www/html
 
-RUN useradd -r -g www-data composer
+RUN useradd composer -g www-data
 RUN chown -R composer:www-data /var/www/html
 
 USER composer
