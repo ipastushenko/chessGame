@@ -4,4 +4,6 @@
 Homestead.yaml
 Homestead.json
 .env
+.pg-env
+.composer
 *.swp

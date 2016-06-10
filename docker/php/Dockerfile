@@ -25,9 +25,13 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php -r "if (hash_file('SHA384', 'composer-setup.php') === '070854512ef404f16bac87071a6db9fd9721da1684cd4589b1196c3faf71b9a2682e2311b36a5079825e155ac7ce150d') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 RUN php composer-setup.php --install-dir=/bin --filename=composer
 RUN php -r "unlink('composer-setup.php');"
+RUN apt-get install -y git unzip
 
 ADD . /var/www/html
 
-USER www-data
+RUN useradd composer -g www-data
+RUN chown -R composer:www-data /var/www/html
+
+USER composer
 
 CMD ["php-fpm"]

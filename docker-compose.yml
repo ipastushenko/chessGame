@@ -20,7 +20,7 @@ pg:
   build: ./docker/pg
   ports:
     - 5432:5432
-  env_file: .env
+  env_file: .pg-env
 redis:
   dockerfile: Dockerfile
   build: ./docker/redis
