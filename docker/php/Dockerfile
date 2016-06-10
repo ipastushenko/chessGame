@@ -23,4 +23,6 @@ RUN docker-php-ext-install pdo_pgsql
 
 ADD . /var/www/html
 
+USER www-data
+
 CMD ["php-fpm"]
