@@ -12,7 +12,7 @@ php:
   build: ./docker/php
   links:
     - pg
-    - redis
+    - redis-server
   volumes:
     - .:/var/www/html
 pg:
@@ -21,7 +21,7 @@ pg:
   ports:
     - 5432:5432
   env_file: .pg-env
-redis:
+redis-server:
   dockerfile: Dockerfile
   build: ./docker/redis
   ports:

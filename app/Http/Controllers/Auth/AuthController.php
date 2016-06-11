@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\User;
 use Validator;
 use App\Http\Controllers\Controller;
-use App\Events\RegistrationEvent;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Flash;
+use App\Jobs\EmailConfirmation;
 
 class AuthController extends Controller
 {
@@ -66,13 +67,11 @@ class AuthController extends Controller
      */
     protected function create(array $data)
     {
-        $user = User::create([
+        return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
-
-        return $user;
     }
 
     public function register(Request $request) {
@@ -86,10 +85,10 @@ class AuthController extends Controller
 
         $user = $this->create($request->all());
 
-        event(new RegistrationEvent($user));
+        $job = (new EmailConfirmation($user))->onQueue('emails');
+        $this->dispatch($job);
 
-        //TODO: need to add new redirect
-        Auth::guard($this->getGuard())->login($user);
+        Flash::success('You have been registered. Check your email please.');
 
         return redirect($this->redirectPath());
     }
