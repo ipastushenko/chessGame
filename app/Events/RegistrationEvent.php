@@ -7,11 +7,11 @@ use App\Events\Event;
 use Illuminate\Queue\SerializesModels;
 
 class RegistrationEvent extends Event {
-  use SerializesModels;
+    use SerializesModels;
 
-  public $user;
+    public $user;
 
-  public function __construct(User $user) {
-    $this->user = $user;
-  }
+    public function __construct(User $user) {
+        $this->user = $user;
+    }
 }
