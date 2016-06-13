@@ -92,4 +92,17 @@ class AuthController extends Controller
 
         return redirect($this->redirectPath());
     }
+
+    public function authenticated($request, $user) {
+        if (!$user->confirmed) {
+            Flash::error(
+                'Your email has not confirmed. Please check your email'
+            );
+            Auth::logout();
+
+            return redirect($this->redirectPath());
+        }
+
+        return redirect()->intended($this->redirectPath());
+    }
 }
