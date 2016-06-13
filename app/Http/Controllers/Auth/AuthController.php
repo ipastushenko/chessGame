@@ -100,7 +100,7 @@ class AuthController extends Controller
             );
             Auth::logout();
 
-            return redirect($this->redirectPath());
+            return back();
         }
 
         return redirect()->intended($this->redirectPath());
