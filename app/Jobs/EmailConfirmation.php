@@ -39,7 +39,7 @@ class EmailConfirmation extends Job implements ShouldQueue
         ]);
         Mail::send(
             'emails.confirmation', 
-            ['token' => $uuid],
+            ['token' => $uuid, 'user' => $user],
             function($m) use ($user) {
                 $m->to($user->email, $user->name)->subject(
                     'Email confirmation'

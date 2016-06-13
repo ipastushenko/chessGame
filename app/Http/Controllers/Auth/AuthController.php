@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use Validator;
+use App\Services\AuthService;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
@@ -11,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Flash;
 use App\Jobs\EmailConfirmation;
+use DB;
+use Log;
 
 class AuthController extends Controller
 {
@@ -34,14 +37,17 @@ class AuthController extends Controller
      */
     protected $redirectTo = '/';
 
+    protected $authService;
+
     /**
      * Create a new authentication controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(AuthService $authService)
     {
         $this->middleware($this->guestMiddleware(), ['except' => 'logout']);
+        $this->authService = $authService;
     }
 
     /**
@@ -104,5 +110,14 @@ class AuthController extends Controller
         }
 
         return redirect()->intended($this->redirectPath());
+    }
+
+    public function confirmation($token) {
+        $user = $this->authService->confirmUser($token);
+        if ($user) {
+            Auth::guard($this->getGuard())->login($user);
+        }
+
+        return redirect($this->redirectPath());
     }
 }
