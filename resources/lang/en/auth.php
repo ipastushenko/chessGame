@@ -15,5 +15,9 @@ return [
 
     'failed' => 'These credentials do not match our records.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
-
+    'successRegistration' => 'You have been registered. Check your email please.',
+    'emailNotConfirmed' => 'Your email has not confirmed. Please check your email',
+    'emailConfirmationSubject' => 'Email confirmation',
+    'successConfirmation' => 'Your email has been confirmed. Thank you for registration on ChessGame!',
+    'errorConfirmation' => 'Your confirmation link is not valid.',
 ];

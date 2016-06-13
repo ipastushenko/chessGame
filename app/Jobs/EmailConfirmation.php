@@ -3,13 +3,12 @@
 namespace App\Jobs;
 
 use App\Jobs\Job;
+use App\Services\AuthService;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use Mail;
-use DB;
-use Carbon\Carbon;
 use App\User;
 
 class EmailConfirmation extends Job implements ShouldQueue
@@ -30,19 +29,14 @@ class EmailConfirmation extends Job implements ShouldQueue
      */
     public function handle()
     {
-        $uuid = uuid_create();
+        $info = AuthService::createConfirmationInfo($this->user);
         $user = $this->user;
-        DB::table('user_confirmation')->insert([
-            'token' => $uuid,
-            'email' => $user->email,
-            'created_at' => new Carbon(),
-        ]);
         Mail::send(
             'emails.confirmation', 
-            ['token' => $uuid, 'user' => $user],
+            ['token' => $info['token'], 'user' => $user],
             function($m) use ($user) {
                 $m->to($user->email, $user->name)->subject(
-                    'Email confirmation'
+                    trans('auth.emailConfirmationSubject')
                 );
             }
         );

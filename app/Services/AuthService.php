@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\User;
+use Illuminate\Support\Facades\Bus;
+use App\Jobs\EmailConfirmation;
+use Carbon\Carbon;
 use DB;
 use Log;
 
@@ -30,5 +33,32 @@ class AuthService {
         }
 
         return null;
+    }
+
+    /**
+     * Send confirmation info for user
+     *
+     * @return void
+     */
+    public static function sendConfirmationInfo($user) {
+        $job = (new EmailConfirmation($user))
+            ->onQueue(config('app.emailQueue'));
+        Bus::dispatch($job);
+    }
+
+    /**
+     * Create confirmation info
+     *
+     * @return info
+     */
+    public static function createConfirmationInfo($user) {
+        $info = array(
+            'token' => uuid_create(),
+            'email' => $user->email,
+            'created_at' => new Carbon()
+        );
+        DB::table('user_confirmation')->insert($info);
+
+        return $info;
     }
 }

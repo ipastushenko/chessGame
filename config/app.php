@@ -207,4 +207,5 @@ return [
         'Flash' => Laracasts\Flash\Flash::class
     ],
 
+    'emailQueue' => env('EMAIL_QUEUE', 'emails'),
 ];

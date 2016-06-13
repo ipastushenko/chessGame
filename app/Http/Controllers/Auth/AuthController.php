@@ -11,9 +11,6 @@ use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Flash;
-use App\Jobs\EmailConfirmation;
-use DB;
-use Log;
 
 class AuthController extends Controller
 {
@@ -82,7 +79,6 @@ class AuthController extends Controller
 
     public function register(Request $request) {
         $validator = $this->validator($request->all());
-
         if ($validator->fails()) {
             $this->throwValidationException(
                 $request, $validator
@@ -90,22 +86,17 @@ class AuthController extends Controller
         }
 
         $user = $this->create($request->all());
+        $this->authService->sendConfirmationInfo($user);
 
-        $job = (new EmailConfirmation($user))->onQueue('emails');
-        $this->dispatch($job);
-
-        Flash::success('You have been registered. Check your email please.');
-
+        Flash::success(trans('auth.successRegistration'));
         return redirect($this->redirectPath());
     }
 
     public function authenticated($request, $user) {
         if (!$user->confirmed) {
-            Flash::error(
-                'Your email has not confirmed. Please check your email'
-            );
             Auth::logout();
 
+            Flash::error(trans('auth.emailNotConfirmed'));
             return back();
         }
 
@@ -116,6 +107,9 @@ class AuthController extends Controller
         $user = $this->authService->confirmUser($token);
         if ($user) {
             Auth::guard($this->getGuard())->login($user);
+            Flash::success(trans('auth.successConfirmation'));
+        } else {
+            Flash::error(trans('auth.errorConfirmation'));
         }
 
         return redirect($this->redirectPath());
