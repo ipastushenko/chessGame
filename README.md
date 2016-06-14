@@ -26,3 +26,4 @@ Project for learning new features
 * Run ```docker-compose up -d``` for start project
 * Run ```docker-compose stop``` for stop project
 * Your app is avaliable on http://localhost
+* Run ```docker-compose run php php artisan queue:listen redis --queue emails``` for execute jobs in 'emails' queue

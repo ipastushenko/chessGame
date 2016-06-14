@@ -10,6 +10,8 @@ use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\Exceptions\ConfirmTokenIsNotFoundException;
+use App\Services\Exceptions\ConfirmTokenExpiredException;
 use Flash;
 
 class AuthController extends Controller
@@ -104,12 +106,14 @@ class AuthController extends Controller
     }
 
     public function confirmation($token) {
-        $user = $this->authService->confirmUser($token);
-        if ($user) {
+        try {
+            $user = $this->authService->confirmUser($token);
             Auth::guard($this->getGuard())->login($user);
             Flash::success(trans('auth.successConfirmation'));
-        } else {
+        } catch (ConfirmTokenIsNotFoundException $e) {
             Flash::error(trans('auth.errorConfirmation'));
+        } catch (ConfirmTokenExpiredException $e) {
+            Flash::error(trans('auth.expiredConfirmation'));
         }
 
         return redirect($this->redirectPath());

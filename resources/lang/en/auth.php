@@ -20,4 +20,5 @@ return [
     'emailConfirmationSubject' => 'Email confirmation',
     'successConfirmation' => 'Your email has been confirmed. Thank you for registration on ChessGame!',
     'errorConfirmation' => 'Your confirmation link is not valid.',
+    'expiredConfirmation' => 'Your confirmation link has expired. We have sent to you new link for email confirmation',
 ];
