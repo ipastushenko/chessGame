@@ -104,4 +104,5 @@ return [
         ],
     ],
 
+    'confirmTokenExpired' => env('CONFIRM_TOKEN_EXPIRED', 3600),
 ];

@@ -11,10 +11,14 @@
 |
 */
 
+// Root
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Authentiction
 Route::auth();
+Route::get('/user/confirmation/{token}', 'Auth\AuthController@confirmation');
 
+// Dashboard
 Route::get('/home', 'HomeController@index');

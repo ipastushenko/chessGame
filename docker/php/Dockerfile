@@ -21,6 +21,10 @@ RUN docker-php-ext-install tokenizer
 RUN apt-get install -y libpq-dev
 RUN docker-php-ext-install pdo_pgsql
 
+RUN apt-get install -y uuid-dev
+RUN pecl install uuid
+RUN docker-php-ext-enable uuid
+
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php -r "if (hash_file('SHA384', 'composer-setup.php') === '070854512ef404f16bac87071a6db9fd9721da1684cd4589b1196c3faf71b9a2682e2311b36a5079825e155ac7ce150d') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 RUN php composer-setup.php --install-dir=/bin --filename=composer

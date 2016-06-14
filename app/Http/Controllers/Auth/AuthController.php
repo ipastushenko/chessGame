@@ -4,9 +4,15 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use Validator;
+use App\Services\AuthService;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Services\Exceptions\ConfirmTokenIsNotFoundException;
+use App\Services\Exceptions\ConfirmTokenExpiredException;
+use Flash;
 
 class AuthController extends Controller
 {
@@ -30,14 +36,17 @@ class AuthController extends Controller
      */
     protected $redirectTo = '/';
 
+    protected $authService;
+
     /**
      * Create a new authentication controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(AuthService $authService)
     {
         $this->middleware($this->guestMiddleware(), ['except' => 'logout']);
+        $this->authService = $authService;
     }
 
     /**
@@ -68,5 +77,45 @@ class AuthController extends Controller
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
+    }
+
+    public function register(Request $request) {
+        $validator = $this->validator($request->all());
+        if ($validator->fails()) {
+            $this->throwValidationException(
+                $request, $validator
+            );
+        }
+
+        $user = $this->create($request->all());
+        $this->authService->sendConfirmationInfo($user);
+
+        Flash::success(trans('auth.successRegistration'));
+        return redirect($this->redirectPath());
+    }
+
+    public function authenticated($request, $user) {
+        if (!$user->confirmed) {
+            Auth::logout();
+
+            Flash::error(trans('auth.emailNotConfirmed'));
+            return back();
+        }
+
+        return redirect()->intended($this->redirectPath());
+    }
+
+    public function confirmation($token) {
+        try {
+            $user = $this->authService->confirmUser($token);
+            Auth::guard($this->getGuard())->login($user);
+            Flash::success(trans('auth.successConfirmation'));
+        } catch (ConfirmTokenIsNotFoundException $e) {
+            Flash::error(trans('auth.errorConfirmation'));
+        } catch (ConfirmTokenExpiredException $e) {
+            Flash::error(trans('auth.expiredConfirmation'));
+        }
+
+        return redirect($this->redirectPath());
     }
 }
